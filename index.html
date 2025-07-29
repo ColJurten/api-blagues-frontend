@@ -338,12 +338,15 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'https://api-blagues-backend.onrender.com/api/v1';
+        // Configuration de l'API
+        const API_BASE_URL = 'http://localhost:3000/api/v1';
 
+        // Fonction pour récupérer une blague aléatoire
         async function getRandomJoke() {
             const jokeDisplay = document.getElementById('jokeDisplay');
             const loading = document.getElementById('loading');
             
+            // Afficher le loading
             jokeDisplay.style.display = 'none';
             loading.style.display = 'flex';
             
@@ -356,6 +359,18 @@
                 
                 const data = await response.json();
                 
+                // Simuler un délai pour l'effet visuel
+                setTimeout(() => {
+                    if (data.success && data.data) {
+                        displayJoke(data.data.contenu);
+                    } else {
+                        displayError('Aucune blague trouvée ! 😢');
+                    }
+                    
+                    loading.style.display = 'none';
+                    jokeDisplay.style.display = 'flex';
+                }, 1000);
+                
             } catch (error) {
                 console.error('Erreur:', error);
                 
@@ -367,15 +382,20 @@
             }
         }
         
+        // Fonction pour afficher une blague
         function displayJoke(jokeContent) {
             const jokeDisplay = document.getElementById('jokeDisplay');
             jokeDisplay.innerHTML = `
                 <div class="joke-text">
                     "${jokeContent}"
                 </div>
-            `; 
+            `;
+            
+            // Ajouter un effet de confettis
+            createConfetti();
         }
         
+        // Fonction pour afficher une erreur
         function displayError(errorMessage) {
             const jokeDisplay = document.getElementById('jokeDisplay');
             jokeDisplay.innerHTML = `
@@ -384,7 +404,27 @@
                 </div>
             `;
         }
-
+        
+        // Fonction pour créer des confettis lors d'une blague
+        function createConfetti() {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    // Nettoyer après l'animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 4000);
+                }, i * 100);
+            }
+        }
+        
+        // Charger une blague au chargement de la page
         window.addEventListener('load', () => {
             setTimeout(getRandomJoke, 1000);
         });
